@@ -1,0 +1,23 @@
+# ─────────────────────────────────────────────
+# FAMILYBOARD — CONFIGURATION RENDER (render.yaml)
+#
+# Ce fichier dit à Render.com comment lancer
+# notre serveur automatiquement.
+# Render est un service d'hébergement GRATUIT
+# pour les petits projets.
+#
+# Pour l'utiliser :
+#   1. Crée un compte sur https://render.com
+#   2. Connecte ton dépôt GitHub
+#   3. Render lit ce fichier et configure tout seul
+# ─────────────────────────────────────────────
+
+services:
+  - type: web              # Type de service : serveur web
+    name: familyboard      # Nom du service sur Render
+    runtime: python        # Langage utilisé
+    buildCommand: pip install -r requirements.txt   # Commande d'installation
+    startCommand: gunicorn app:app                  # Commande de lancement
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.0"
