@@ -70,7 +70,7 @@ const char* WIFI_PASSWORD = "MOT_DE_PASSE_WIFI";      // Mot de passe WiFi
 //   - En production sur Render → "https://familyboard.onrender.com/api/pages"
 // ─────────────────────────────────────────────
 
-const char* URL_SERVEUR = "familyboard-amfr.onrender.com/api/pages";
+const char* URL_SERVEUR = "https://inutilepubconnexion-hash.github.io/familyboard//api/pages";
 
 
 // ─────────────────────────────────────────────
