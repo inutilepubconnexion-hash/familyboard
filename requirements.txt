@@ -1,8 +1,0 @@
-# Flask : le framework qui crée le serveur web
-flask
-
-# Flask-CORS : autorise le site web à parler au serveur
-flask-cors
-
-# Gunicorn : serveur de production utilisé par Render
-gunicorn
