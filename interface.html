@@ -1,0 +1,1458 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FamilyBoard — Interface</title>
+
+  <!--
+    ╔══════════════════════════════════════════════════════╗
+    ║  FAMILYBOARD — PAGE PRINCIPALE                       ║
+    ║  Cette page contient deux sections :                 ║
+    ║  1. L'agenda hebdomadaire (référence visuelle)       ║
+    ║  2. Les 5 pages du boîtier (messages à envoyer)      ║
+    ╚══════════════════════════════════════════════════════╝
+  -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    /* ─────────────────────────────────────────────
+       VARIABLES CSS
+       Même palette que la page de connexion
+       pour garder une cohérence visuelle.
+    ───────────────────────────────────────────── */
+    :root {
+      --couleur-fond:         #0f1117;
+      --couleur-surface:      #1a1d27;
+      --couleur-surface-2:    #1f2235;
+      --couleur-bordure:      #2a2d3a;
+      --couleur-bordure-doux: #1e2130;
+      --couleur-accent:       #e8c97e;
+      --couleur-accent-hover: #f0d898;
+      --couleur-accent-doux:  rgba(232, 201, 126, 0.12);
+      --couleur-texte:        #f0ede8;
+      --couleur-texte-doux:   #7a7f94;
+      --couleur-texte-tres-doux: #3a3d4e;
+      --couleur-succes:       #6fcf97;
+      --couleur-erreur:       #e07070;
+      --couleur-aujourd-hui:  rgba(232, 201, 126, 0.15);
+      --rayon:                12px;
+      --rayon-grand:          16px;
+    }
+
+    /* ─────────────────────────────────────────────
+       RESET ET BASE
+    ───────────────────────────────────────────── */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--couleur-fond);
+      font-family: 'DM Sans', sans-serif;
+      color: var(--couleur-texte);
+      min-height: 100vh;
+    }
+
+    /* ─────────────────────────────────────────────
+       BARRE DE NAVIGATION EN HAUT
+       Contient le logo, le nom du boîtier et
+       le bouton de déconnexion.
+    ───────────────────────────────────────────── */
+    .navbar {
+      background: var(--couleur-surface);
+      border-bottom: 1px solid var(--couleur-bordure);
+      padding: 0 32px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;             /* Reste en haut même en scrollant */
+      top: 0;
+      z-index: 100;
+    }
+
+    /* Logo + titre dans la navbar */
+    .navbar-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .navbar-icone {
+      width: 36px;
+      height: 36px;
+      background: var(--couleur-accent);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .navbar-titre {
+      font-family: 'DM Serif Display', serif;
+      font-size: 20px;
+      color: var(--couleur-texte);
+    }
+
+    /* Informations boîtier (numéro de série) */
+    .navbar-info {
+      font-size: 12px;
+      color: var(--couleur-texte-doux);
+      background: var(--couleur-fond);
+      border: 1px solid var(--couleur-bordure);
+      border-radius: 20px;
+      padding: 5px 14px;
+    }
+
+    /* Bouton déconnexion */
+    .bouton-deconnexion {
+      background: transparent;
+      border: 1px solid var(--couleur-bordure);
+      color: var(--couleur-texte-doux);
+      border-radius: 8px;
+      padding: 7px 14px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .bouton-deconnexion:hover {
+      border-color: var(--couleur-erreur);
+      color: var(--couleur-erreur);
+    }
+
+    /* ─────────────────────────────────────────────
+       CONTENU PRINCIPAL
+       Zone scrollable sous la navbar.
+    ───────────────────────────────────────────── */
+    .contenu {
+      max-width: 1100px;            /* Largeur maximale pour les grands écrans */
+      margin: 0 auto;               /* Centré horizontalement */
+      padding: 32px 24px 60px;
+    }
+
+    /* ─────────────────────────────────────────────
+       TITRES DE SECTION
+       "Agenda de la semaine" et "Pages du boîtier"
+    ───────────────────────────────────────────── */
+    .titre-section {
+      font-family: 'DM Serif Display', serif;
+      font-size: 22px;
+      color: var(--couleur-texte);
+      margin-bottom: 4px;
+    }
+
+    .sous-titre-section {
+      font-size: 13px;
+      color: var(--couleur-texte-doux);
+      margin-bottom: 20px;
+    }
+
+    /* Ligne décorative dorée à gauche du titre */
+    .entete-section {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .ligne-accent {
+      width: 3px;
+      height: 44px;
+      background: var(--couleur-accent);
+      border-radius: 2px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    /* Séparateur entre les deux sections */
+    .separateur-section {
+      border: none;
+      border-top: 1px solid var(--couleur-bordure);
+      margin: 40px 0;
+    }
+
+
+    /* ══════════════════════════════════════════════
+       SECTION 1 : AGENDA HEBDOMADAIRE
+    ══════════════════════════════════════════════ */
+
+    /* ─────────────────────────────────────────────
+       BARRE DE NAVIGATION DE L'AGENDA
+       Contient les boutons semaine précédente/suivante
+       et l'affichage de la semaine courante.
+    ───────────────────────────────────────────── */
+    .agenda-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .agenda-periode {
+      font-size: 15px;
+      color: var(--couleur-texte);
+      font-weight: 500;
+    }
+
+    .agenda-periode span {
+      color: var(--couleur-accent);
+    }
+
+    /* Boutons < et > pour changer de semaine */
+    .bouton-semaine {
+      background: var(--couleur-surface);
+      border: 1px solid var(--couleur-bordure);
+      color: var(--couleur-texte);
+      border-radius: 8px;
+      width: 34px;
+      height: 34px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .bouton-semaine:hover {
+      border-color: var(--couleur-accent);
+      color: var(--couleur-accent);
+    }
+
+    /* Groupe des deux boutons + texte période */
+    .agenda-nav-centre {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    /* Bouton "Aujourd'hui" pour revenir à la semaine actuelle */
+    .bouton-aujourdhui {
+      background: transparent;
+      border: 1px solid var(--couleur-bordure);
+      color: var(--couleur-texte-doux);
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .bouton-aujourdhui:hover {
+      border-color: var(--couleur-accent);
+      color: var(--couleur-accent);
+    }
+
+    /* ─────────────────────────────────────────────
+       GRILLE DE L'AGENDA
+       7 colonnes, une par jour de la semaine.
+    ───────────────────────────────────────────── */
+    .agenda-grille {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr); /* 7 colonnes égales */
+      gap: 8px;
+    }
+
+    /* ─────────────────────────────────────────────
+       COLONNE D'UN JOUR
+       Contient le nom du jour, le numéro, et les
+       événements de ce jour.
+    ───────────────────────────────────────────── */
+    .agenda-jour {
+      background: var(--couleur-surface);
+      border: 1px solid var(--couleur-bordure);
+      border-radius: var(--rayon);
+      padding: 12px 10px;
+      min-height: 140px;
+      display: flex;
+      flex-direction: column;       /* Empile verticalement */
+      gap: 6px;
+      transition: border-color 0.2s ease;
+      cursor: pointer;
+    }
+
+    .agenda-jour:hover {
+      border-color: var(--couleur-accent);
+    }
+
+    /* Jour d'aujourd'hui mis en valeur */
+    .agenda-jour.aujourd-hui {
+      background: var(--couleur-aujourd-hui);
+      border-color: var(--couleur-accent);
+    }
+
+    /* Nom du jour (LUN, MAR...) */
+    .jour-nom {
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--couleur-texte-doux);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    /* Numéro du jour (1, 2, 3...) */
+    .jour-numero {
+      font-size: 20px;
+      font-family: 'DM Serif Display', serif;
+      color: var(--couleur-texte);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    /* Numéro surligné pour aujourd'hui */
+    .agenda-jour.aujourd-hui .jour-numero {
+      color: var(--couleur-accent);
+    }
+
+    /* ─────────────────────────────────────────────
+       ÉVÉNEMENT DANS L'AGENDA
+       Une petite pastille colorée par événement.
+    ───────────────────────────────────────────── */
+    .evenement {
+      background: var(--couleur-accent-doux);
+      border-left: 2px solid var(--couleur-accent);
+      border-radius: 4px;
+      padding: 4px 6px;
+      font-size: 11px;
+      color: var(--couleur-texte);
+      line-height: 1.3;
+      cursor: pointer;
+      transition: background 0.2s ease;
+      word-break: break-word;
+    }
+
+    .evenement:hover {
+      background: rgba(232, 201, 126, 0.22);
+    }
+
+    /* Heure de l'événement en petit */
+    .evenement-heure {
+      font-size: 10px;
+      color: var(--couleur-accent);
+      font-weight: 500;
+      display: block;
+    }
+
+    /* Bouton + pour ajouter un événement dans un jour */
+    .bouton-ajouter-jour {
+      margin-top: auto;             /* Poussé en bas de la colonne */
+      background: transparent;
+      border: 1px dashed var(--couleur-texte-tres-doux);
+      color: var(--couleur-texte-tres-doux);
+      border-radius: 6px;
+      padding: 4px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+
+    .bouton-ajouter-jour:hover {
+      border-color: var(--couleur-accent);
+      color: var(--couleur-accent);
+    }
+
+
+    /* ══════════════════════════════════════════════
+       MODALE D'AJOUT D'ÉVÉNEMENT
+       Fenêtre popup qui apparaît quand on clique
+       sur le bouton "+" d'un jour.
+    ══════════════════════════════════════════════ */
+
+    /* Fond semi-transparent derrière la modale */
+    .overlay-modale {
+      display: none;                /* Caché par défaut */
+      position: fixed;
+      inset: 0;                     /* Couvre tout l'écran */
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);   /* Flou derrière la modale */
+    }
+
+    /* Quand on lui ajoute la classe "visible" */
+    .overlay-modale.visible {
+      display: flex;
+    }
+
+    /* La modale elle-même */
+    .modale {
+      background: var(--couleur-surface);
+      border: 1px solid var(--couleur-bordure);
+      border-radius: var(--rayon-grand);
+      padding: 32px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+      animation: apparition-modale 0.25s ease forwards;
+    }
+
+    @keyframes apparition-modale {
+      from { opacity: 0; transform: scale(0.95); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    .modale-titre {
+      font-family: 'DM Serif Display', serif;
+      font-size: 20px;
+      margin-bottom: 6px;
+    }
+
+    .modale-sous-titre {
+      font-size: 13px;
+      color: var(--couleur-texte-doux);
+      margin-bottom: 24px;
+    }
+
+    /* Champs de la modale */
+    .modale-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--couleur-texte-doux);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+    }
+
+    .modale-input,
+    .modale-textarea {
+      width: 100%;
+      background: var(--couleur-fond);
+      border: 1px solid var(--couleur-bordure);
+      border-radius: 8px;
+      color: var(--couleur-texte);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      padding: 10px 12px;
+      outline: none;
+      margin-bottom: 16px;
+      transition: border-color 0.2s ease;
+    }
+
+    .modale-input:focus,
+    .modale-textarea:focus {
+      border-color: var(--couleur-accent);
+    }
+
+    .modale-textarea {
+      resize: vertical;             /* Redimensionnable verticalement seulement */
+      min-height: 80px;
+    }
+
+    /* Boutons de la modale */
+    .modale-boutons {
+      display: flex;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .bouton-annuler {
+      flex: 1;
+      background: transparent;
+      border: 1px solid var(--couleur-bordure);
+      color: var(--couleur-texte-doux);
+      border-radius: 8px;
+      padding: 11px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .bouton-annuler:hover {
+      border-color: var(--couleur-texte-doux);
+      color: var(--couleur-texte);
+    }
+
+    .bouton-ajouter-evenement {
+      flex: 2;
+      background: var(--couleur-accent);
+      border: none;
+      color: #1a1400;
+      border-radius: 8px;
+      padding: 11px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .bouton-ajouter-evenement:hover {
+      background: var(--couleur-accent-hover);
+    }
+
+
+    /* ══════════════════════════════════════════════
+       SECTION 2 : PAGES DU BOÎTIER
+    ══════════════════════════════════════════════ */
+
+    /* ─────────────────────────────────────────────
+       GRILLE DES 5 PAGES
+       Affiche les pages en grille responsive :
+       3 colonnes sur grand écran, 2 sur moyen, 1 sur petit.
+    ───────────────────────────────────────────── */
+    .pages-grille {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    /* La 5ème page est centrée sur la dernière ligne */
+    .pages-grille .carte-page:nth-child(4) { grid-column: 1; }
+    .pages-grille .carte-page:nth-child(5) { grid-column: 2; }
+
+    /* ─────────────────────────────────────────────
+       CARTE D'UNE PAGE DU BOÎTIER
+       Chaque carte représente une des 5 pages
+       qui s'afficheront sur l'écran OLED.
+    ───────────────────────────────────────────── */
+    .carte-page {
+      background: var(--couleur-surface);
+      border: 1px solid var(--couleur-bordure);
+      border-radius: var(--rayon-grand);
+      padding: 20px;
+      transition: border-color 0.2s ease;
+      animation: apparition 0.4s ease both; /* Animation d'entrée */
+    }
+
+    /* Décale l'animation de chaque carte pour un effet cascade */
+    .carte-page:nth-child(1) { animation-delay: 0.05s; }
+    .carte-page:nth-child(2) { animation-delay: 0.10s; }
+    .carte-page:nth-child(3) { animation-delay: 0.15s; }
+    .carte-page:nth-child(4) { animation-delay: 0.20s; }
+    .carte-page:nth-child(5) { animation-delay: 0.25s; }
+
+    @keyframes apparition {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .carte-page:hover {
+      border-color: var(--couleur-accent);
+    }
+
+    /* En-tête de la carte : numéro de page + badge "Page X" */
+    .carte-page-entete {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .carte-page-numero {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--couleur-accent);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      background: var(--couleur-accent-doux);
+      border-radius: 20px;
+      padding: 3px 10px;
+    }
+
+    /* Petit écran OLED simulé (décoratif) */
+    .carte-page-ecran {
+      width: 28px;
+      height: 18px;
+      border: 1.5px solid var(--couleur-bordure);
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .carte-page-ecran::after {
+      content: '';
+      width: 14px;
+      height: 2px;
+      background: var(--couleur-texte-tres-doux);
+      border-radius: 1px;
+      box-shadow: 0 3px 0 var(--couleur-texte-tres-doux),
+                  0 6px 0 var(--couleur-texte-tres-doux);
+    }
+
+    /* Labels des champs */
+    .champ-label {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--couleur-texte-doux);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    /* Champ date de l'événement */
+    .champ-date {
+      width: 100%;
+      background: var(--couleur-fond);
+      border: 1px solid var(--couleur-bordure);
+      border-radius: 8px;
+      color: var(--couleur-texte);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      padding: 9px 12px;
+      outline: none;
+      margin-bottom: 12px;
+      transition: border-color 0.2s ease;
+    }
+
+    .champ-date:focus {
+      border-color: var(--couleur-accent);
+    }
+
+    .champ-date::placeholder {
+      color: var(--couleur-texte-tres-doux);
+    }
+
+    /* Champ message (textarea multiligne) */
+    .champ-message {
+      width: 100%;
+      background: var(--couleur-fond);
+      border: 1px solid var(--couleur-bordure);
+      border-radius: 8px;
+      color: var(--couleur-texte);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      padding: 9px 12px;
+      outline: none;
+      resize: vertical;
+      min-height: 80px;
+      line-height: 1.5;
+      transition: border-color 0.2s ease;
+    }
+
+    .champ-message:focus {
+      border-color: var(--couleur-accent);
+    }
+
+    .champ-message::placeholder {
+      color: var(--couleur-texte-tres-doux);
+    }
+
+    /* Compteur de caractères sous le textarea */
+    .compteur-chars {
+      font-size: 11px;
+      color: var(--couleur-texte-tres-doux);
+      text-align: right;
+      margin-top: 4px;
+      margin-bottom: 0;
+    }
+
+    /* Quand on approche la limite */
+    .compteur-chars.proche-limite {
+      color: var(--couleur-erreur);
+    }
+
+    /* ─────────────────────────────────────────────
+       ZONE D'ENVOI
+       Contient le bouton "Envoyer au boîtier"
+       et le message de confirmation.
+    ───────────────────────────────────────────── */
+    .zone-envoi {
+      background: var(--couleur-surface);
+      border: 1px solid var(--couleur-bordure);
+      border-radius: var(--rayon-grand);
+      padding: 24px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .zone-envoi-texte .titre-envoi {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--couleur-texte);
+      margin-bottom: 4px;
+    }
+
+    .zone-envoi-texte .desc-envoi {
+      font-size: 13px;
+      color: var(--couleur-texte-doux);
+    }
+
+    /* Bouton principal d'envoi */
+    .bouton-envoyer {
+      background: var(--couleur-accent);
+      border: none;
+      color: #1a1400;
+      border-radius: 10px;
+      padding: 13px 28px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.2s ease, transform 0.1s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .bouton-envoyer:hover {
+      background: var(--couleur-accent-hover);
+    }
+
+    .bouton-envoyer:active {
+      transform: scale(0.97);
+    }
+
+    /* État "envoi en cours" */
+    .bouton-envoyer.envoi-en-cours {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    /* ─────────────────────────────────────────────
+       NOTIFICATION DE CONFIRMATION
+       Apparaît en bas de l'écran après l'envoi.
+    ───────────────────────────────────────────── */
+    .notification {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--couleur-surface);
+      border: 1px solid var(--couleur-succes);
+      border-radius: 10px;
+      padding: 14px 20px;
+      font-size: 14px;
+      color: var(--couleur-succes);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      z-index: 300;
+      display: none;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .notification.visible {
+      display: flex;
+      animation: glissement 0.3s ease forwards;
+    }
+
+    @keyframes glissement {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─────────────────────────────────────────────
+       RESPONSIVE — PETITS ÉCRANS
+       Adapte la mise en page pour les téléphones.
+    ───────────────────────────────────────────── */
+    @media (max-width: 900px) {
+      .agenda-grille {
+        grid-template-columns: repeat(4, 1fr); /* 4 jours par ligne */
+      }
+    }
+
+    @media (max-width: 700px) {
+      .pages-grille {
+        grid-template-columns: 1fr 1fr;
+      }
+      .pages-grille .carte-page:nth-child(5) {
+        grid-column: 1 / -1;       /* Prend toute la largeur */
+      }
+      .zone-envoi {
+        flex-direction: column;
+        text-align: center;
+      }
+      .agenda-grille {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .navbar { padding: 0 16px; }
+      .contenu { padding: 20px 16px 40px; }
+      .pages-grille { grid-template-columns: 1fr; }
+      .pages-grille .carte-page:nth-child(4),
+      .pages-grille .carte-page:nth-child(5) { grid-column: 1; }
+      .agenda-grille { grid-template-columns: repeat(2, 1fr); }
+    }
+
+  </style>
+</head>
+<body>
+
+  <!--
+    ══════════════════════════════════════════════
+    BARRE DE NAVIGATION
+    ══════════════════════════════════════════════
+  -->
+  <nav class="navbar">
+    <div class="navbar-logo">
+      <div class="navbar-icone">🏠</div>
+      <span class="navbar-titre">FamilyBoard</span>
+    </div>
+    <!-- Affiche le numéro de série du boîtier connecté -->
+    <span class="navbar-info">Boîtier · FB-0001</span>
+    <!-- Retourne à la page de connexion -->
+    <button class="bouton-deconnexion" onclick="window.location.href='login.html'">
+      Déconnexion
+    </button>
+  </nav>
+
+
+  <!--
+    ══════════════════════════════════════════════
+    CONTENU PRINCIPAL
+    ══════════════════════════════════════════════
+  -->
+  <main class="contenu">
+
+
+    <!-- ══════════════════════════════════════════
+         SECTION 1 : AGENDA HEBDOMADAIRE
+    ══════════════════════════════════════════════ -->
+    <div class="entete-section">
+      <div class="ligne-accent"></div>
+      <div>
+        <h2 class="titre-section">Agenda de la semaine</h2>
+        <p class="sous-titre-section">Référence visuelle — cliquez sur un jour pour ajouter un événement</p>
+      </div>
+    </div>
+
+    <!-- Navigation semaine précédente / suivante -->
+    <div class="agenda-nav">
+      <button class="bouton-aujourdhui" onclick="allerAujourdhui()">Aujourd'hui</button>
+      <div class="agenda-nav-centre">
+        <button class="bouton-semaine" onclick="changerSemaine(-1)" title="Semaine précédente">‹</button>
+        <!-- Ce texte est mis à jour par JavaScript -->
+        <span class="agenda-periode" id="periode-agenda">chargement...</span>
+        <button class="bouton-semaine" onclick="changerSemaine(+1)" title="Semaine suivante">›</button>
+      </div>
+      <!-- Espace vide pour équilibrer la mise en page -->
+      <div style="width: 90px;"></div>
+    </div>
+
+    <!-- Grille des 7 jours — générée par JavaScript -->
+    <div class="agenda-grille" id="agenda-grille">
+      <!-- Les colonnes des jours sont créées par la fonction afficherSemaine() -->
+    </div>
+
+
+    <hr class="separateur-section" />
+
+
+    <!-- ══════════════════════════════════════════
+         SECTION 2 : PAGES DU BOÎTIER
+    ══════════════════════════════════════════════ -->
+    <div class="entete-section">
+      <div class="ligne-accent"></div>
+      <div>
+        <h2 class="titre-section">Pages du boîtier</h2>
+        <p class="sous-titre-section">Remplissez les 5 pages qui s'afficheront sur l'écran de votre boîtier</p>
+      </div>
+    </div>
+
+    <!-- Grille des 5 cartes — une par page du boîtier -->
+    <div class="pages-grille" id="pages-grille">
+      <!--
+        Les 5 cartes sont générées par JavaScript (fonction creerCartesPagesBoitier())
+        pour éviter la répétition de code HTML.
+      -->
+    </div>
+
+    <!-- Zone d'envoi avec le bouton principal -->
+    <div class="zone-envoi">
+      <div class="zone-envoi-texte">
+        <p class="titre-envoi">Envoyer vers le boîtier</p>
+        <p class="desc-envoi">Les 5 pages seront transmises au boîtier connecté · FB-0001</p>
+      </div>
+      <button class="bouton-envoyer" id="bouton-envoyer" onclick="envoyerAuBoitier()">
+        <span>📡</span>
+        <span>Envoyer au boîtier</span>
+      </button>
+    </div>
+
+  </main>
+
+
+  <!--
+    ══════════════════════════════════════════════
+    MODALE D'AJOUT D'ÉVÉNEMENT
+    Fenêtre popup pour ajouter un événement à l'agenda.
+    Cachée par défaut, affichée par JavaScript.
+    ══════════════════════════════════════════════
+  -->
+  <div class="overlay-modale" id="overlay-modale" onclick="fermerModale(event)">
+    <div class="modale">
+      <h3 class="modale-titre">Ajouter un événement</h3>
+      <!-- Ce sous-titre est mis à jour par JavaScript avec la date du jour cliqué -->
+      <p class="modale-sous-titre" id="modale-sous-titre">Chargement...</p>
+
+      <label class="modale-label" for="modale-heure">Heure (optionnel)</label>
+      <input class="modale-input" type="text" id="modale-heure" placeholder="ex : 18h00" maxlength="10" />
+
+      <label class="modale-label" for="modale-texte">Description</label>
+      <textarea class="modale-textarea" id="modale-texte" placeholder="ex : Dentiste Thomas" maxlength="80"></textarea>
+
+      <div class="modale-boutons">
+        <button class="bouton-annuler" onclick="fermerModaleDirecte()">Annuler</button>
+        <button class="bouton-ajouter-evenement" onclick="ajouterEvenement()">Ajouter</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!--
+    ══════════════════════════════════════════════
+    NOTIFICATION DE CONFIRMATION D'ENVOI
+    ══════════════════════════════════════════════
+  -->
+  <div class="notification" id="notification">
+    <span>✅</span>
+    <span>Pages envoyées au boîtier avec succès !</span>
+  </div>
+
+
+  <script>
+  /*
+  ════════════════════════════════════════════════════════════
+  JAVASCRIPT — LOGIQUE DE L'INTERFACE PRINCIPALE
+  Ce script gère :
+    1. L'agenda hebdomadaire (affichage, navigation, événements)
+    2. Les 5 pages du boîtier (champs, compteurs)
+    3. L'envoi du JSON au backend
+  ════════════════════════════════════════════════════════════
+  */
+
+
+  /* ──────────────────────────────────────────────
+     DONNÉES GLOBALES
+
+     Ces variables stockent les informations
+     nécessaires au fonctionnement de la page.
+  ────────────────────────────────────────────── */
+
+  // Décalage de semaine par rapport à la semaine actuelle
+  // 0 = semaine actuelle, 1 = semaine suivante, -1 = semaine précédente
+  let decalageSemaine = 0;
+
+  // Stocke tous les événements de l'agenda
+  // Format : { "2024-05-24": [{heure: "18h00", texte: "Dentiste Thomas"}, ...], ... }
+  let evenementsAgenda = {};
+
+  // Index du jour sur lequel l'utilisateur a cliqué pour ouvrir la modale
+  // Sert à savoir dans quel jour ajouter l'événement
+  let jourModaleSelectionnee = null;
+
+  // Noms des jours pour l'affichage
+  const NOMS_JOURS = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
+
+  // Noms des mois pour l'affichage
+  const NOMS_MOIS = [
+    "janvier", "février", "mars", "avril", "mai", "juin",
+    "juillet", "août", "septembre", "octobre", "novembre", "décembre"
+  ];
+
+
+  /* ──────────────────────────────────────────────
+     FONCTIONS DE L'AGENDA
+  ────────────────────────────────────────────── */
+
+  /*
+    obtenirLundiDeLaSemaine(date)
+    Retourne la date du lundi de la semaine
+    contenant la date passée en paramètre.
+    Exemple : si date = mercredi 22 mai → retourne lundi 20 mai
+  */
+  function obtenirLundiDeLaSemaine(date) {
+    const d = new Date(date);
+    // getDay() retourne 0 (dimanche) à 6 (samedi)
+    // On calcule combien de jours nous sépare du lundi
+    const jourDeLaSemaine = d.getDay(); // 0=dim, 1=lun, ..., 6=sam
+    const diffVersLundi = (jourDeLaSemaine === 0) ? -6 : 1 - jourDeLaSemaine;
+    d.setDate(d.getDate() + diffVersLundi);
+    d.setHours(0, 0, 0, 0); // Remet l'heure à minuit pour éviter les bugs
+    return d;
+  }
+
+  /*
+    formaterDateCle(date)
+    Transforme une date en chaîne de caractères
+    au format "AAAA-MM-JJ" pour l'utiliser comme
+    clé dans l'objet evenementsAgenda.
+    Exemple : 24 mai 2024 → "2024-05-24"
+  */
+  function formaterDateCle(date) {
+    const annee = date.getFullYear();
+    const mois  = String(date.getMonth() + 1).padStart(2, '0'); // padStart ajoute un 0 si besoin
+    const jour  = String(date.getDate()).padStart(2, '0');
+    return `${annee}-${mois}-${jour}`;
+  }
+
+  /*
+    afficherSemaine()
+    Construit et affiche la grille des 7 jours
+    pour la semaine sélectionnée.
+    C'est la fonction principale de l'agenda.
+  */
+  function afficherSemaine() {
+
+    // On calcule le lundi de la semaine à afficher
+    const aujourd_hui = new Date();
+    const lundi = obtenirLundiDeLaSemaine(aujourd_hui);
+    // On ajoute le décalage de semaine (en jours : décalage * 7)
+    lundi.setDate(lundi.getDate() + decalageSemaine * 7);
+
+    // On calcule le dimanche (dernier jour de la semaine)
+    const dimanche = new Date(lundi);
+    dimanche.setDate(dimanche.getDate() + 6);
+
+    // On met à jour le texte de la période (ex: "20 – 26 mai 2024")
+    const texte_periode = document.getElementById("periode-agenda");
+    if (lundi.getMonth() === dimanche.getMonth()) {
+      // Même mois : "20 – 26 mai 2024"
+      texte_periode.innerHTML = `${lundi.getDate()} – ${dimanche.getDate()} <span>${NOMS_MOIS[lundi.getMonth()]} ${lundi.getFullYear()}</span>`;
+    } else {
+      // Mois différents : "29 mai – 4 juin 2024"
+      texte_periode.innerHTML = `${lundi.getDate()} ${NOMS_MOIS[lundi.getMonth()]} – ${dimanche.getDate()} <span>${NOMS_MOIS[dimanche.getMonth()]} ${dimanche.getFullYear()}</span>`;
+    }
+
+    // On vide la grille avant de la reconstruire
+    const grille = document.getElementById("agenda-grille");
+    grille.innerHTML = '';
+
+    // Clé de la date d'aujourd'hui pour la comparer
+    const cleAujourdhui = formaterDateCle(aujourd_hui);
+
+    // On crée une colonne pour chacun des 7 jours
+    for (let i = 0; i < 7; i++) {
+
+      // Date de ce jour
+      const date = new Date(lundi);
+      date.setDate(date.getDate() + i);
+      const cle = formaterDateCle(date); // ex: "2024-05-24"
+
+      // Vérifie si c'est aujourd'hui pour le style spécial
+      const estAujourdhui = (cle === cleAujourdhui);
+
+      // Récupère les événements de ce jour (tableau vide si aucun)
+      const evenements = evenementsAgenda[cle] || [];
+
+      // ── Construit le HTML de la colonne ──
+
+      // En-tête : nom du jour + numéro
+      let htmlColonne = `
+        <div class="jour-nom">${NOMS_JOURS[date.getDay()]}</div>
+        <div class="jour-numero">${date.getDate()}</div>
+      `;
+
+      // Événements du jour
+      evenements.forEach((ev, index) => {
+        htmlColonne += `
+          <div class="evenement" title="Cliquer pour supprimer"
+               onclick="supprimerEvenement(event, '${cle}', ${index})">
+            ${ev.heure ? `<span class="evenement-heure">${ev.heure}</span>` : ''}
+            ${ev.texte}
+          </div>
+        `;
+      });
+
+      // Bouton + pour ajouter un événement
+      htmlColonne += `
+        <button class="bouton-ajouter-jour" onclick="ouvrirModale('${cle}', '${date.getDate()} ${NOMS_MOIS[date.getMonth()]}')">+</button>
+      `;
+
+      // Crée la div de la colonne et l'ajoute à la grille
+      const colonne = document.createElement('div');
+      colonne.className = 'agenda-jour' + (estAujourdhui ? ' aujourd-hui' : '');
+      colonne.innerHTML = htmlColonne;
+      grille.appendChild(colonne);
+    }
+  }
+
+  /*
+    changerSemaine(direction)
+    Passe à la semaine suivante (+1) ou précédente (-1).
+    Vérifie qu'on ne dépasse pas 1 an dans le futur.
+  */
+  function changerSemaine(direction) {
+    const nouvDecalage = decalageSemaine + direction;
+
+    // Limite à 52 semaines dans le futur (~1 an)
+    if (nouvDecalage > 52) {
+      alert("Vous ne pouvez pas planifier au-delà d'un an à l'avance.");
+      return;
+    }
+
+    decalageSemaine = nouvDecalage;
+    afficherSemaine();
+  }
+
+  /*
+    allerAujourdhui()
+    Revient à la semaine actuelle.
+  */
+  function allerAujourdhui() {
+    decalageSemaine = 0;
+    afficherSemaine();
+  }
+
+
+  /* ──────────────────────────────────────────────
+     FONCTIONS DE LA MODALE D'AJOUT
+  ────────────────────────────────────────────── */
+
+  /*
+    ouvrirModale(cle, nomJour)
+    Ouvre la fenêtre popup pour ajouter un événement.
+    - cle : la date au format "AAAA-MM-JJ"
+    - nomJour : texte affiché ex: "24 mai"
+  */
+  function ouvrirModale(cle, nomJour) {
+    // Mémorise pour quel jour on ajoute l'événement
+    jourModaleSelectionnee = cle;
+
+    // Met à jour le sous-titre de la modale
+    document.getElementById("modale-sous-titre").textContent = `Le ${nomJour}`;
+
+    // Vide les champs
+    document.getElementById("modale-heure").value = '';
+    document.getElementById("modale-texte").value = '';
+
+    // Affiche la modale
+    document.getElementById("overlay-modale").classList.add("visible");
+
+    // Met le focus sur le champ heure
+    setTimeout(() => document.getElementById("modale-heure").focus(), 100);
+  }
+
+  /*
+    fermerModale(event)
+    Ferme la modale si l'utilisateur clique sur le fond sombre.
+    "event" contient les informations sur le clic.
+  */
+  function fermerModale(event) {
+    // On ferme seulement si le clic est sur l'overlay (le fond),
+    // pas sur la modale elle-même
+    if (event.target === document.getElementById("overlay-modale")) {
+      fermerModaleDirecte();
+    }
+  }
+
+  /*
+    fermerModaleDirecte()
+    Ferme la modale sans condition (bouton Annuler).
+  */
+  function fermerModaleDirecte() {
+    document.getElementById("overlay-modale").classList.remove("visible");
+    jourModaleSelectionnee = null;
+  }
+
+  /*
+    ajouterEvenement()
+    Ajoute l'événement saisi dans l'agenda et ferme la modale.
+  */
+  function ajouterEvenement() {
+    const heure = document.getElementById("modale-heure").value.trim();
+    const texte = document.getElementById("modale-texte").value.trim();
+
+    // Vérifie qu'il y a au moins une description
+    if (!texte) {
+      document.getElementById("modale-texte").focus();
+      return;
+    }
+
+    // Crée le tableau pour ce jour s'il n'existe pas encore
+    if (!evenementsAgenda[jourModaleSelectionnee]) {
+      evenementsAgenda[jourModaleSelectionnee] = [];
+    }
+
+    // Ajoute l'événement
+    evenementsAgenda[jourModaleSelectionnee].push({ heure, texte });
+
+    // Ferme la modale et rafraîchit l'agenda
+    fermerModaleDirecte();
+    afficherSemaine();
+  }
+
+  /*
+    supprimerEvenement(event, cle, index)
+    Supprime un événement quand on clique dessus.
+    - event : le clic (pour stopper la propagation)
+    - cle : la date
+    - index : la position dans le tableau d'événements
+  */
+  function supprimerEvenement(event, cle, index) {
+    // Empêche le clic de se propager à la colonne parente
+    event.stopPropagation();
+
+    if (confirm("Supprimer cet événement ?")) {
+      // Supprime 1 élément à l'index donné
+      evenementsAgenda[cle].splice(index, 1);
+      afficherSemaine();
+    }
+  }
+
+
+  /* ──────────────────────────────────────────────
+     FONCTIONS DES PAGES DU BOÎTIER
+  ────────────────────────────────────────────── */
+
+  /*
+    creerCartesPagesBoitier()
+    Génère dynamiquement les 5 cartes des pages du boîtier.
+    On utilise une boucle pour éviter de répéter 5 fois le même HTML.
+  */
+  function creerCartesPagesBoitier() {
+    const grille = document.getElementById("pages-grille");
+    grille.innerHTML = ''; // Vide au cas où
+
+    for (let i = 1; i <= 5; i++) {
+      // Crée la carte
+      const carte = document.createElement('div');
+      carte.className = 'carte-page';
+      carte.innerHTML = `
+        <!-- En-tête de la carte -->
+        <div class="carte-page-entete">
+          <span class="carte-page-numero">Page ${i}</span>
+          <div class="carte-page-ecran" title="Aperçu de l'écran OLED"></div>
+        </div>
+
+        <!-- Champ date de l'événement -->
+        <label class="champ-label" for="date-page-${i}">Date de l'événement</label>
+        <input
+          class="champ-date"
+          type="text"
+          id="date-page-${i}"
+          placeholder="ex : 24 mai 18h · dentiste"
+          maxlength="40"
+        />
+
+        <!-- Champ message -->
+        <label class="champ-label" for="message-page-${i}">Message</label>
+        <textarea
+          class="champ-message"
+          id="message-page-${i}"
+          placeholder="ex : N'oublie pas de vider le lave-vaisselle !"
+          maxlength="100"
+          oninput="mettreAJourCompteur(${i})"
+        ></textarea>
+        <p class="compteur-chars" id="compteur-${i}">0 / 100</p>
+      `;
+
+      grille.appendChild(carte);
+    }
+  }
+
+  /*
+    mettreAJourCompteur(numeroPage)
+    Met à jour le compteur de caractères sous le textarea
+    quand l'utilisateur tape du texte.
+  */
+  function mettreAJourCompteur(numeroPage) {
+    const textarea  = document.getElementById(`message-page-${numeroPage}`);
+    const compteur  = document.getElementById(`compteur-${numeroPage}`);
+    const longueur  = textarea.value.length;
+    const maximum   = 100;
+
+    // Met à jour le texte du compteur
+    compteur.textContent = `${longueur} / ${maximum}`;
+
+    // Change la couleur si on approche de la limite (90% = 90 caractères)
+    if (longueur >= 90) {
+      compteur.classList.add("proche-limite");
+    } else {
+      compteur.classList.remove("proche-limite");
+    }
+  }
+
+
+  /* ──────────────────────────────────────────────
+     CONFIGURATION DU BACKEND
+  ────────────────────────────────────────────── */
+
+  /*
+    ADRESSE DU BACKEND
+    ⚠️ IMPORTANT : change cette valeur selon où tu en es :
+      - En test local        → "http://localhost:5000"
+      - En production Render → "https://familyboard.onrender.com"
+        (remplace par l'URL exacte que Render te donnera)
+  */
+  const URL_BACKEND = "familyboard-amfr.onrender.com ";
+
+
+  /* ──────────────────────────────────────────────
+     ENVOI AU BOÎTIER
+  ────────────────────────────────────────────── */
+
+  /*
+    envoyerAuBoitier()
+    Collecte les données des 5 pages, les met en forme
+    en JSON, et les envoie au backend via une requête HTTP POST.
+    Le backend les sauvegarde dans pages.json
+    que le boîtier ESP32 lira toutes les minutes.
+  */
+  async function envoyerAuBoitier() {
+    const bouton = document.getElementById("bouton-envoyer");
+
+    // Désactive le bouton pendant l'envoi pour éviter les doubles clics
+    bouton.classList.add("envoi-en-cours");
+    bouton.innerHTML = '<span>⏳</span><span>Envoi en cours...</span>';
+
+    // ── Collecte les données des 5 pages ──
+    const pages = [];
+    for (let i = 1; i <= 5; i++) {
+      pages.push({
+        page:    i,
+        date:    document.getElementById(`date-page-${i}`).value.trim(),
+        message: document.getElementById(`message-page-${i}`).value.trim()
+      });
+    }
+
+    // ── Construit l'objet JSON à envoyer ──
+    const donnees = {
+      boitier_id: "FB-0001",
+      date_envoi: new Date().toISOString(),
+      pages:      pages
+    };
+
+    try {
+      /*
+        fetch() envoie une requête HTTP POST au backend.
+        On attend la réponse avec "await" avant de continuer.
+      */
+      const reponse = await fetch(`${URL_BACKEND}/api/pages`, {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify(donnees)
+        // JSON.stringify transforme l'objet JS en texte JSON
+        // Ex: { pages: [...] } → '{"pages":[...]}'
+      });
+
+      // Transforme la réponse en objet JavaScript
+      const resultat = await reponse.json();
+
+      if (resultat.succes) {
+        // ✅ Envoi réussi → notification verte
+        afficherNotification("✅", "Pages envoyées au boîtier avec succès !");
+      } else {
+        // ❌ Le backend a répondu mais signale une erreur
+        afficherNotification("❌", `Erreur : ${resultat.erreur}`, true);
+      }
+
+    } catch (erreur) {
+      // ❌ Impossible de contacter le serveur (éteint, pas de réseau...)
+      console.error("Erreur d'envoi :", erreur);
+      afficherNotification("❌", "Impossible de contacter le serveur.", true);
+    }
+
+    // Réactive le bouton dans tous les cas
+    bouton.classList.remove("envoi-en-cours");
+    bouton.innerHTML = '<span>📡</span><span>Envoyer au boîtier</span>';
+  }
+
+  /*
+    afficherNotification(icone, texte, erreur)
+    Affiche la notification en bas à droite de l'écran.
+    - icone  : emoji affiché devant le message
+    - texte  : le message à afficher
+    - erreur : si true, la bordure devient rouge (défaut : verte)
+  */
+  function afficherNotification(icone, texte, erreur = false) {
+    const notification = document.getElementById("notification");
+
+    // Change la couleur selon succès ou erreur
+    notification.style.borderColor = erreur
+      ? "var(--couleur-erreur)"
+      : "var(--couleur-succes)";
+    notification.style.color = erreur
+      ? "var(--couleur-erreur)"
+      : "var(--couleur-succes)";
+
+    // Met à jour le contenu
+    notification.innerHTML = `<span>${icone}</span><span>${texte}</span>`;
+
+    // Affiche la notification
+    notification.classList.add("visible");
+
+    // La cache automatiquement après 3 secondes
+    setTimeout(() => notification.classList.remove("visible"), 3000);
+  }
+
+
+  /* ──────────────────────────────────────────────
+     CHARGEMENT DES PAGES EXISTANTES AU DÉMARRAGE
+  ────────────────────────────────────────────── */
+
+  /*
+    chargerPagesExistantes()
+    Au chargement de la page, on interroge le backend
+    pour récupérer les pages déjà enregistrées et
+    les afficher dans les champs.
+    Ainsi, si quelqu'un a déjà envoyé des messages,
+    ils restent visibles quand on se reconnecte.
+  */
+  async function chargerPagesExistantes() {
+    try {
+      /*
+        Requête GET : on lit les données sans en envoyer.
+        C'est la méthode par défaut de fetch().
+      */
+      const reponse  = await fetch(`${URL_BACKEND}/api/pages`);
+      const donnees  = await reponse.json();
+
+      // Remplit chaque champ avec les données reçues
+      if (donnees.pages && donnees.pages.length === 5) {
+        donnees.pages.forEach(page => {
+          const champDate    = document.getElementById(`date-page-${page.page}`);
+          const champMessage = document.getElementById(`message-page-${page.page}`);
+
+          if (champDate)    champDate.value    = page.date    || "";
+          if (champMessage) champMessage.value = page.message || "";
+
+          // Met à jour le compteur de caractères pour chaque page
+          mettreAJourCompteur(page.page);
+        });
+      }
+
+    } catch (erreur) {
+      // Si le serveur n'est pas joignable, on affiche juste un avertissement
+      // dans la console (pas bloquant pour l'utilisateur)
+      console.warn("Impossible de charger les pages existantes :", erreur);
+    }
+  }
+
+
+  /* ──────────────────────────────────────────────
+     INITIALISATION
+     Code exécuté automatiquement au chargement
+     de la page.
+  ────────────────────────────────────────────── */
+
+  // 1. Crée les 5 cartes des pages du boîtier
+  creerCartesPagesBoitier();
+
+  // 2. Affiche l'agenda de la semaine actuelle
+  afficherSemaine();
+
+  // 3. Charge les pages déjà enregistrées depuis le backend
+  chargerPagesExistantes();
+
+  // 4. Raccourci clavier : Échap pour fermer la modale
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') fermerModaleDirecte();
+  });
+
+  </script>
+
+</body>
+</html>
