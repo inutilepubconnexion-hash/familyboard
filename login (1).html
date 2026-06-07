@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FamilyBoard — Connexion</title>
+
+  <!--
+    ╔══════════════════════════════════════════════════════╗
+    ║  FAMLYBOARD — PAGE DE CONNEXION                      ║
+    ║  Ce fichier gère uniquement la page de connexion.    ║
+    ║  L'utilisateur entre son code d'accès et est         ║
+    ║  redirigé vers l'interface principale.               ║
+    ╚══════════════════════════════════════════════════════╝
+  -->
+
+  <!--
+    Google Fonts : on importe deux polices
+    - "DM Serif Display" : police élégante pour les titres
+    - "DM Sans" : police moderne et lisible pour le texte normal
+  -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    /* ─────────────────────────────────────────────
+       VARIABLES CSS
+       On définit ici toutes les couleurs et tailles
+       utilisées dans la page. Si tu veux changer
+       une couleur, tu n'as à le faire qu'ici.
+    ───────────────────────────────────────────── */
+    :root {
+      --couleur-fond:        #0f1117;   /* Fond général très sombre */
+      --couleur-carte:       #1a1d27;   /* Fond de la carte de connexion */
+      --couleur-bordure:     #2a2d3a;   /* Bordure subtile */
+      --couleur-accent:      #e8c97e;   /* Or doux — couleur principale */
+      --couleur-accent-hover:#f0d898;   /* Or plus clair au survol */
+      --couleur-texte:       #f0ede8;   /* Texte principal blanc cassé */
+      --couleur-texte-doux:  #7a7f94;   /* Texte secondaire grisé */
+      --couleur-erreur:      #e07070;   /* Rouge pour les erreurs */
+      --couleur-input-fond:  #12141e;   /* Fond du champ de saisie */
+      --rayon-carte:         16px;       /* Arrondi des coins de la carte */
+      --ombre-carte:         0 24px 64px rgba(0,0,0,0.5); /* Ombre portée */
+    }
+
+    /* ─────────────────────────────────────────────
+       RESET DE BASE
+       Supprime les marges et paddings par défaut
+       du navigateur pour partir d'une base propre.
+    ───────────────────────────────────────────── */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* ─────────────────────────────────────────────
+       BODY — LE FOND DE LA PAGE
+       On centre la carte de connexion
+       verticalement et horizontalement.
+    ───────────────────────────────────────────── */
+    body {
+      background-color: var(--couleur-fond);
+      font-family: 'DM Sans', sans-serif;
+      color: var(--couleur-texte);
+      min-height: 100vh;           /* Prend toute la hauteur de l'écran */
+      display: flex;               /* Active le mode flexbox */
+      align-items: center;         /* Centre verticalement */
+      justify-content: center;     /* Centre horizontalement */
+      padding: 20px;               /* Marge sur les petits écrans */
+      overflow: hidden;            /* Cache les éléments décoratifs qui dépassent */
+      position: relative;
+    }
+
+    /* ─────────────────────────────────────────────
+       CERCLES DÉCORATIFS EN ARRIÈRE-PLAN
+       Ce sont de grandes formes floues colorées
+       qui donnent de la profondeur au fond.
+       Elles sont positionnées de façon absolue
+       et ne gênent pas le contenu.
+    ───────────────────────────────────────────── */
+    body::before,
+    body::after {
+      content: '';                  /* Nécessaire pour afficher les pseudo-éléments */
+      position: absolute;
+      border-radius: 50%;           /* Forme circulaire */
+      filter: blur(80px);           /* Flou pour un effet doux */
+      opacity: 0.12;                /* Très transparent */
+      pointer-events: none;         /* Ne bloque pas les clics */
+      z-index: 0;                   /* Derrière tout le contenu */
+    }
+
+    /* Cercle en haut à gauche */
+    body::before {
+      width: 500px;
+      height: 500px;
+      background: var(--couleur-accent);
+      top: -150px;
+      left: -150px;
+    }
+
+    /* Cercle en bas à droite */
+    body::after {
+      width: 400px;
+      height: 400px;
+      background: #7e9ee8;          /* Bleu complémentaire */
+      bottom: -100px;
+      right: -100px;
+    }
+
+    /* ─────────────────────────────────────────────
+       CARTE DE CONNEXION
+       Le bloc blanc/sombre au centre de la page
+       qui contient tout le formulaire.
+    ───────────────────────────────────────────── */
+    .carte-connexion {
+      background: var(--couleur-carte);
+      border: 1px solid var(--couleur-bordure);
+      border-radius: var(--rayon-carte);
+      box-shadow: var(--ombre-carte);
+      padding: 48px 44px;
+      width: 100%;
+      max-width: 420px;             /* Largeur maximale de la carte */
+      position: relative;           /* Pour que z-index fonctionne */
+      z-index: 1;                   /* Au-dessus des cercles décoratifs */
+
+      /* Animation d'apparition au chargement de la page */
+      animation: apparition 0.6s ease forwards;
+    }
+
+    /* ─────────────────────────────────────────────
+       ANIMATION D'APPARITION
+       La carte monte légèrement et apparaît
+       en fondu quand la page se charge.
+    ───────────────────────────────────────────── */
+    @keyframes apparition {
+      from {
+        opacity: 0;
+        transform: translateY(20px); /* Part de 20px en dessous */
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);    /* Arrive à sa position normale */
+      }
+    }
+
+    /* ─────────────────────────────────────────────
+       ICÔNE EN HAUT DE LA CARTE
+       Le petit carré doré avec le symbole maison.
+    ───────────────────────────────────────────── */
+    .icone-logo {
+      width: 52px;
+      height: 52px;
+      background: var(--couleur-accent);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+      font-size: 22px;
+    }
+
+    /* ─────────────────────────────────────────────
+       TITRE PRINCIPAL
+       "FamilyBoard" en grande police élégante.
+    ───────────────────────────────────────────── */
+    .titre {
+      font-family: 'DM Serif Display', serif;
+      font-size: 28px;
+      color: var(--couleur-texte);
+      margin-bottom: 6px;
+      line-height: 1.2;
+    }
+
+    /* ─────────────────────────────────────────────
+       SOUS-TITRE
+       La phrase descriptive sous le titre.
+    ───────────────────────────────────────────── */
+    .sous-titre {
+      font-size: 14px;
+      color: var(--couleur-texte-doux);
+      font-weight: 300;
+      margin-bottom: 36px;
+      line-height: 1.5;
+    }
+
+    /* ─────────────────────────────────────────────
+       GROUPE DE CHAMP
+       Contient le label + le champ de saisie.
+    ───────────────────────────────────────────── */
+    .groupe-champ {
+      margin-bottom: 20px;
+    }
+
+    /* Label au-dessus du champ */
+    .groupe-champ label {
+      display: block;               /* S'affiche sur sa propre ligne */
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--couleur-texte-doux);
+      text-transform: uppercase;    /* Lettres majuscules */
+      letter-spacing: 0.1em;        /* Espacement entre les lettres */
+      margin-bottom: 8px;
+    }
+
+    /* ─────────────────────────────────────────────
+       CONTENEUR DU CHAMP DE SAISIE
+       Permet de placer l'icône cadenas à l'intérieur
+       du champ visuellement.
+    ───────────────────────────────────────────── */
+    .conteneur-input {
+      position: relative;
+    }
+
+    /* Icône cadenas à gauche du champ */
+    .icone-input {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);  /* Centré verticalement */
+      color: var(--couleur-texte-doux);
+      font-size: 16px;
+      pointer-events: none;         /* Ne bloque pas la saisie */
+    }
+
+    /* ─────────────────────────────────────────────
+       CHAMP DE SAISIE (INPUT)
+       Le champ où l'utilisateur tape son code.
+    ───────────────────────────────────────────── */
+    .champ-input {
+      width: 100%;
+      background: var(--couleur-input-fond);
+      border: 1px solid var(--couleur-bordure);
+      border-radius: 10px;
+      color: var(--couleur-texte);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      padding: 13px 14px 13px 42px; /* padding-left grand pour laisser place à l'icône */
+      outline: none;                /* Supprime le contour bleu par défaut */
+      transition: border-color 0.2s ease; /* Animation douce au focus */
+      letter-spacing: 0.15em;       /* Espace entre les caractères du code */
+    }
+
+    /* Quand l'utilisateur clique sur le champ (focus) */
+    .champ-input:focus {
+      border-color: var(--couleur-accent); /* Bordure dorée */
+    }
+
+    /* Texte fantôme dans le champ vide */
+    .champ-input::placeholder {
+      color: #3a3d4e;
+      letter-spacing: 0.05em;
+    }
+
+    /* ─────────────────────────────────────────────
+       MESSAGE D'ERREUR
+       Apparaît en rouge si le code est incorrect.
+       Caché par défaut (display: none).
+    ───────────────────────────────────────────── */
+    .message-erreur {
+      display: none;                /* Caché par défaut */
+      color: var(--couleur-erreur);
+      font-size: 13px;
+      margin-top: 8px;
+      padding-left: 4px;
+    }
+
+    /* Quand on lui ajoute la classe "visible" en JavaScript */
+    .message-erreur.visible {
+      display: block;               /* Devient visible */
+      animation: secousse 0.3s ease; /* Petite animation de secousse */
+    }
+
+    /* Animation de secousse pour l'erreur */
+    @keyframes secousse {
+      0%, 100% { transform: translateX(0); }
+      25%       { transform: translateX(-6px); }
+      75%       { transform: translateX(6px); }
+    }
+
+    /* ─────────────────────────────────────────────
+       BOUTON SE CONNECTER
+       Le bouton principal doré.
+    ───────────────────────────────────────────── */
+    .bouton-connexion {
+      width: 100%;
+      background: var(--couleur-accent);
+      color: #1a1400;               /* Texte sombre sur fond doré */
+      border: none;
+      border-radius: 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+      padding: 14px;
+      cursor: pointer;              /* Curseur main au survol */
+      margin-top: 8px;
+      transition: background 0.2s ease, transform 0.1s ease; /* Animations douces */
+      letter-spacing: 0.02em;
+    }
+
+    /* Effet au survol */
+    .bouton-connexion:hover {
+      background: var(--couleur-accent-hover);
+    }
+
+    /* Effet quand on clique (enfoncé) */
+    .bouton-connexion:active {
+      transform: scale(0.98);       /* Légèrement rétréci */
+    }
+
+    /* ─────────────────────────────────────────────
+       LIGNE DE SÉPARATION
+       La fine ligne horizontale avec "prototype"
+       au-dessous.
+    ───────────────────────────────────────────── */
+    .separateur {
+      border: none;
+      border-top: 1px solid var(--couleur-bordure);
+      margin: 32px 0 20px;
+    }
+
+    /* Texte de version prototype en bas */
+    .texte-version {
+      text-align: center;
+      font-size: 12px;
+      color: var(--couleur-texte-doux);
+      opacity: 0.6;
+    }
+
+  </style>
+</head>
+<body>
+
+  <!--
+    ══════════════════════════════════════════════
+    CARTE DE CONNEXION
+    C'est le bloc central visible sur la page.
+    ══════════════════════════════════════════════
+  -->
+  <div class="carte-connexion">
+
+    <!-- Icône logo (emoji maison dans un carré doré) -->
+    <div class="icone-logo">🏠</div>
+
+    <!-- Titre et sous-titre -->
+    <h1 class="titre">FamilyBoard</h1>
+    <p class="sous-titre">Entrez votre code d'accès pour gérer<br />votre boîtier connecté.</p>
+
+    <!--
+      CHAMP NUMÉRO DE SÉRIE
+      L'utilisateur entre le numéro unique de son boîtier.
+    -->
+    <div class="groupe-champ">
+      <label for="numero-serie">Numéro de série du boîtier</label>
+      <div class="conteneur-input">
+        <!-- Icône boîtier -->
+        <span class="icone-input">📟</span>
+        <input
+          class="champ-input"
+          type="text"
+          id="numero-serie"
+          placeholder="ex : FB-0001"
+          autocomplete="off"
+          maxlength="20"
+        />
+      </div>
+    </div>
+
+    <!--
+      CHAMP CODE D'ACCÈS
+      "for" sur le label doit correspondre à "id" sur l'input
+      pour qu'un clic sur le label active le champ.
+    -->
+    <div class="groupe-champ">
+      <label for="code-acces">Code d'accès</label>
+      <div class="conteneur-input">
+        <!-- Icône cadenas (caractère unicode) -->
+        <span class="icone-input">🔑</span>
+        <input
+          class="champ-input"
+          type="password"
+          id="code-acces"
+          placeholder="••••••••"
+          autocomplete="off"
+          maxlength="20"
+        />
+      </div>
+      <!-- Message d'erreur unique pour les deux champs, caché par défaut -->
+      <p class="message-erreur" id="message-erreur">Numéro de série ou code incorrect.</p>
+    </div>
+
+    <!-- Bouton de connexion — appelle la fonction verifierCode() au clic -->
+    <button class="bouton-connexion" onclick="verifierCode()">
+      Se connecter →
+    </button>
+
+    <!-- Ligne de séparation et texte version -->
+    <hr class="separateur" />
+    <p class="texte-version">Prototype v0.1 — Usage familial</p>
+
+  </div>
+
+
+  <script>
+    /*
+    ══════════════════════════════════════════════
+    JAVASCRIPT — LOGIQUE DE CONNEXION
+    Ce script envoie les identifiants au backend
+    Flask et redirige si la réponse est positive.
+    ══════════════════════════════════════════════
+    */
+
+    /*
+      ADRESSE DU BACKEND
+      ⚠️ IMPORTANT : change cette valeur selon où tu en es :
+        - En test local        → "http://localhost:5000"
+        - En production Render → "https://familyboard.onrender.com"
+          (remplace par l'URL exacte que Render te donnera)
+    */
+    const URL_BACKEND = "https://familyboard-ed92.onrender.com";
+
+    /*
+      FONCTION verifierCode()
+      Appelée quand l'utilisateur clique sur "Se connecter".
+      Elle :
+        1. Récupère le numéro de série et le code tapés
+        2. Les envoie au backend via une requête HTTP POST
+        3. Redirige vers l'interface principale si le backend répond "succes: true"
+        4. Affiche une erreur sinon
+
+      "async" signifie que la fonction peut attendre une réponse réseau
+      sans bloquer le reste de la page.
+    */
+    /*
+      IDENTIFIANTS DU PROTOTYPE
+      La vérification se fait directement ici dans le navigateur.
+      C'est suffisant pour le prototype.
+    */
+    const NUMERO_SERIE = "FB-0001";
+    const CODE_ACCES   = "famille2024";
+
+    function verifierCode() {
+
+      const numeroEntre   = document.getElementById("numero-serie").value.trim();
+      const codeEntre     = document.getElementById("code-acces").value;
+      const messageErreur = document.getElementById("message-erreur");
+
+      // Vérifie que les champs ne sont pas vides
+      if (!numeroEntre || !codeEntre) {
+        afficherErreur(messageErreur, "Veuillez remplir les deux champs.");
+        return;
+      }
+
+      // Compare les valeurs entrées aux valeurs définies
+      if (numeroEntre === NUMERO_SERIE && codeEntre === CODE_ACCES) {
+        // ✅ Correct → redirige vers l'interface
+        window.location.href = "interface.html";
+      } else {
+        // ❌ Incorrect → affiche l'erreur
+        afficherErreur(messageErreur, "Numéro de série ou code incorrect.");
+        document.getElementById("numero-serie").value = "";
+        document.getElementById("code-acces").value   = "";
+        document.getElementById("numero-serie").focus();
+      }
+    }
+
+    /*
+      FONCTION afficherErreur(element, texte)
+      Affiche un message d'erreur avec l'animation de secousse.
+      On la met dans une fonction séparée pour ne pas répéter le code.
+    */
+    function afficherErreur(element, texte) {
+      element.textContent = texte;
+      element.classList.remove("visible");
+      setTimeout(() => element.classList.add("visible"), 10);
+    }
+
+    /*
+      APPUI SUR LA TOUCHE ENTRÉE
+      Permet de valider avec la touche "Entrée" du clavier
+      sans avoir à cliquer sur le bouton.
+      "addEventListener" écoute un événement (ici "keydown" = touche enfoncée).
+    */
+    // Touche Entrée sur le champ numéro de série → passe au champ suivant
+    document.getElementById("numero-serie").addEventListener("keydown", function(evenement) {
+      if (evenement.key === "Enter") {
+        document.getElementById("code-acces").focus(); // Passe au champ code
+      }
+    });
+
+    // Touche Entrée sur le champ code → valide la connexion
+    document.getElementById("code-acces").addEventListener("keydown", function(evenement) {
+      if (evenement.key === "Enter") {
+        verifierCode(); // On appelle la même fonction que le bouton
+      }
+    });
+
+  </script>
+
+</body>
+</html>
